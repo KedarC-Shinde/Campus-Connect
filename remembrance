@@ -1,0 +1,252 @@
+USE campus_connect;
+
+-- First, check what users you have
+SELECT id, email, role FROM users;
+
+-- Then link the mentor to the student (replace emails with your actual emails)
+UPDATE student_profiles 
+SET mentor_id = (SELECT id FROM users WHERE email = 'mentor@college.com' AND role = 'mentor')
+WHERE user_id = (SELECT id FROM users WHERE email = 'student@test1.com' AND role = 'student');
+
+-- Verify the linkage
+SELECT 
+  u.email as student_email,
+  sp.mentor_id,
+  m.email as mentor_email
+FROM student_profiles sp
+JOIN users u ON sp.user_id = u.id
+LEFT JOIN users m ON sp.mentor_id = m.id;
+
+Complete testing worflow:
+Step 1: Register Users
+1a. Register Student
+
+Request: POST → cconnect register (under "Reg, login, fetch details")
+Body:
+{
+  "email": "student@test.com",
+  "password": "password123",
+  "role": "student",
+  "first_name": "John",
+  "last_name": "Doe",
+  "phone": "9876543210"
+}
+Save the token as student_token
+
+1b. Register TPO
+
+Request: POST → Registering a TPO user (under "TPO features")
+Body:
+{
+  "email": "tpo@college.com",
+  "password": "password123",
+  "role": "tpo",
+  "first_name": "Placement",
+  "last_name": "Officer",
+  "phone": "9876543211"
+}
+Save the token as tpo_token
+
+1c. Register Mentor
+
+Request: POST → Mentor register (under "Mentor Features")
+Body:
+{
+  "email": "mentor@college.com",
+  "password": "password123",
+  "role": "mentor",
+  "first_name": "Dr. Rajesh",
+  "last_name": "Kumar",
+  "phone": "9876543212"
+}
+Save the token as mentor_token
+
+1d. Register Recruiter
+
+Request: POST → Register recruiter (under "Recruiter Features")
+Body:
+{
+  "email": "recruiter@techcorp.com",
+  "password": "password123",
+  "role": "recruiter",
+  "first_name": "Sarah",
+  "last_name": "Patel",
+  "phone": "9876543213"
+}
+Save the token as recruiter_token
+
+Step 2: Create Student Profile
+Request: PUT → Profile Updation (under "Student Profile")
+
+Headers: Authorization: Bearer {{student_token}}
+Body:
+{
+  "roll_number": "CS2021001",
+  "branch": "Computer Science",
+  "semester": 6,
+  "cgpa": 8.5,
+  "date_of_birth": "2003-05-15",
+  "linkedin_url": "https://linkedin.com/in/johndoe",
+  "github_url": "https://github.com/johndoe",
+  "skills": [
+    {"name": "React", "proficiency": "advanced"},
+    {"name": "Node.js", "proficiency": "intermediate"},
+    {"name": "Python", "proficiency": "intermediate"}
+  ]
+}
+
+Step 3: Link Mentor to Student (MySQL)
+Run in MySQL Workbench:
+
+USE campus_connect;
+
+UPDATE student_profiles 
+SET mentor_id = (SELECT id FROM users WHERE email = 'mentor@college.com')
+WHERE user_id = (SELECT id FROM users WHERE email = 'student@test.com');
+
+Step 4: TPO Posts Internship
+Request: POST → Posting an internship (under "TPO features")
+
+Headers: Authorization: Bearer {{tpo_token}}
+Body:
+{
+  "title": "Full Stack Developer Intern",
+  "company_name": "TechCorp Solutions",
+  "description": "Looking for passionate full stack developers",
+  "requirements": "Strong knowledge of React, Node.js, and databases",
+  "duration": "6 months",
+  "stipend": "₹25,000/month",
+  "location": "Bangalore",
+  "work_mode": "hybrid",
+  "deadline": "2025-12-31",
+  "total_positions": 3,
+  "required_skills": [
+    {"name": "React", "is_mandatory": true},
+    {"name": "Node.js", "is_mandatory": true},
+    {"name": "MongoDB", "is_mandatory": false}
+  ]
+}
+Step 5: Link Recruiter to Internship (MySQL)
+Run in MySQL Workbench:
+
+USE campus_connect;
+
+UPDATE internships 
+SET recruiter_id = (SELECT id FROM users WHERE email = 'recruiter@techcorp.com')
+WHERE id = 1;
+
+Step 6: Student Browses and Applies
+6a. Browse Internships
+
+Request: GET → Browse Internships (under "Test Student Can See & Apply")
+Headers: Authorization: Bearer {{student_token}}
+
+6b. Apply to Internship
+
+Request: POST → Apply to internship (under "Test Student Can See & Apply")
+Headers: Authorization: Bearer {{student_token}}
+Body:
+{
+  "internship_id": 1,
+  "cover_letter": "I am excited to apply for this position. I have strong skills in React and Node.js..."
+}
+
+6c. Check Notifications
+
+Request: GET → Check notifications (under "Notifs")
+Headers: Authorization: Bearer {{student_token}}
+Should see: "Application Submitted" notification
+
+Step 7: Mentor Approves Application
+7a. View Pending Applications
+
+Request: GET → get pending applications (under "Mentor Features")
+Headers: Authorization: Bearer {{mentor_token}}
+
+7b. Approve Application
+
+Request: PATCH → Approve Application (under "Mentor Features")
+Headers: Authorization: Bearer {{mentor_token}}
+Body:
+{
+  "mentor_remarks": "Good candidate, approved for this opportunity"
+}
+
+7c. Student Checks Notifications
+
+Request: GET → Check notifications
+Headers: Authorization: Bearer {{student_token}}
+Should see: "Application Approved by Mentor" notification
+
+
+Step 8: TPO Forwards to Recruiter
+Request: PATCH → TPO Forwards Application (under "Recruiter Features")
+
+Headers: Authorization: Bearer {{tpo_token}}
+Body:
+{
+  "tpo_remarks": "Highly recommended candidate"
+}
+Student Checks Notifications:
+
+Should see: "Application Forwarded to Recruiter" notification
+
+
+Step 9: Recruiter Reviews and Schedules Interview
+9a. View Applications
+
+Request: GET → Recruiter Views Applications (under "Recruiter Features")
+Headers: Authorization: Bearer {{recruiter_token}}
+
+9b. Schedule Interview
+
+Request: POST → Schedule Interview (under "Recruiter Features")
+Headers: Authorization: Bearer {{recruiter_token}}
+Body:
+{
+  "interview_date": "2025-10-20 14:00:00",
+  "interview_mode": "online",
+  "meeting_link": "https://meet.google.com/xyz-abc-def",
+  "interviewer_name": "Sarah Patel"
+}
+
+Student Checks Notifications:
+
+Should see: "Interview Scheduled" notification
+
+
+Step 10: Recruiter Selects Candidate
+Request: PATCH → Candidate selection (under "Recruiter Features")
+
+Headers: Authorization: Bearer {{recruiter_token}}
+Body:
+{
+  "status": "selected",
+  "recruiter_remarks": "Excellent performance in interview, strong technical skills"
+}
+Student Checks Notifications:
+
+Should see: "Congratulations! You have been selected" notification
+
+
+Step 11: Issue Certificate (Optional)
+Request: POST → Issue Certificate (under "Recruiter Features")
+
+Headers: Authorization: Bearer {{recruiter_token}}
+Body:
+{
+  "completion_date": "2026-04-15",
+  "performance_rating": "excellent",
+  "supervisor_feedback": "Outstanding work throughout the internship period"
+}
+
+Summary of Notification Flow
+After completing this workflow, the student should have 5 notifications:
+
+Profile Created ✓
+Application Submitted ✓
+Application Approved by Mentor ✓
+Application Forwarded to Recruiter ✓
+Interview Scheduled ✓
+Congratulations! You have been selected ✓
+-- End of workflow --
