@@ -6,7 +6,7 @@ const db = require('../config/db');
 // Register new user
 exports.register = async (req, res) => {
   try {
-    const { email, password, role, first_name, last_name, phone } = req.body;
+    const { email, password, role, first_name, last_name, phone, company_name } = req.body;
 
     // Validate input
     if (!email || !password || !role || !first_name || !last_name) {
@@ -25,8 +25,8 @@ exports.register = async (req, res) => {
 
     // Insert user into database
     const [result] = await db.query(
-      'INSERT INTO users (email, password, role, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?, ?)',
-      [email, hashedPassword, role, first_name, last_name, phone]
+      'INSERT INTO users (email, password, role, first_name, last_name, phone, company_name) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [email, hashedPassword, role, first_name, last_name, phone, company_name]
     );
 
     // Create JWT token
@@ -45,7 +45,8 @@ exports.register = async (req, res) => {
         email,
         role,
         first_name,
-        last_name
+        last_name,
+        company_name
       }
     });
   } catch (error) {
