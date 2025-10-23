@@ -1,5 +1,12 @@
 USE campus_connect;
 
+ALTER TABLE users
+ADD COLUMN company_name VARCHAR(255) AFTER phone;
+
+
+
+USE campus_connect;
+
 -- First, check what users you have
 SELECT id, email, role FROM users;
 
