@@ -12,6 +12,5 @@ export const API_ROUTES = {
     PROFILE: `${BASE_URL}/users/profile`,
     UPDATE: `${BASE_URL}/users/update`,
   },
-  // You can add more later, e.g.
-  // PLACEMENTS: { LIST: `${BASE_URL}/placements` },
+  
 };
