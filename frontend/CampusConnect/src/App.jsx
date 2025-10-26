@@ -4,6 +4,7 @@ import StudentHome from "./pages/StudentHome";
 import MentorHome from "./pages/MentorHome";
 import TpoHome from "./pages/TpoHome";
 import RecruiterHome from "./pages/RecruiterHome";
+import StudentProfile from "./pages/StudentProfile";
 
 function App() {
   return (
@@ -13,7 +14,9 @@ function App() {
       <Route path="/mentor/home" element={<MentorHome />} />
       <Route path="/tpo/home" element={<TpoHome />} />
       <Route path="/recruiter/home" element={<RecruiterHome />} />
+      <Route path="/student/profile" element={<StudentProfile />} />
       <Route path="*" element={<Navigate to="/" />} />
+
     </Routes>
   );
 }

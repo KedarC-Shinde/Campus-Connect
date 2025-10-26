@@ -1,0 +1,57 @@
+
+/* Add this to your src/index.css or src/App.css */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Input focus styles */
+input:focus {
+  border-color: #1565c0 !important;
+  outline: none;
+}
+
+select:focus {
+  border-color: #1565c0 !important;
+  outline: none;
+}
+
+/* Button hover effects */
+button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* Specific button hovers */
+button[style*="background-color: #1565c0"]:hover:not(:disabled) {
+  background-color: #0d47a1 !important;
+}
+
+button[style*="border: 1px solid #d32f2f"]:hover {
+  background-color: #ffebee !important;
+}
+
+/* Remove default body margin if needed */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure no global dark styles are overriding */
+* {
+  box-sizing: border-box;
+}
+
+/* Make sure the root div takes full height */
+#root {
+  min-height: 100vh;
+}

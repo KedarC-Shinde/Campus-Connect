@@ -188,6 +188,7 @@ exports.updateProfile = async (req, res) => {
 };
 
 // Get student profile with skills
+// Get student profile with skills
 exports.getMyProfile = async (req, res) => {
   try {
     const student_id = req.user.id;
@@ -198,14 +199,17 @@ exports.getMyProfile = async (req, res) => {
     );
 
     if (profiles.length === 0) {
-      return res.status(404).json({ error: 'Profile not found. Please create your profile first.' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'Profile not found. Please create your profile first.' 
+      });
     }
 
     const profile = profiles[0];
 
-    // Get skills
+    // Get skills - map skill_name to name for consistency
     const [skills] = await db.query(
-      'SELECT skill_name, proficiency FROM student_skills WHERE student_id = ?',
+      'SELECT skill_name as name, proficiency FROM student_skills WHERE student_id = ?',
       [profile.id]
     );
 
@@ -218,7 +222,11 @@ exports.getMyProfile = async (req, res) => {
     });
   } catch (error) {
     console.error('Fetch profile error:', error);
-    res.status(500).json({ error: 'Failed to fetch profile', message: error.message });
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch profile', 
+      message: error.message 
+    });
   }
 };
 

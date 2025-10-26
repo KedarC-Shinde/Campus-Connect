@@ -1,15 +1,19 @@
 // src/pages/StudentHome.jsx
+import TopBar from "../components/TopBar";
 import { dashboardStyles } from "../styles/DashboardStyles";
-import LogoutButton from "../components/LogoutButton";
 
 export default function StudentHome() {
   return (
-    <div style={dashboardStyles.container}>
-      <h1 style={{ ...dashboardStyles.title, color: "#1565c0" }}>
-        Student Dashboard
-      </h1>
-      <p style={dashboardStyles.subtitle}>This is your Student Dashboard.</p>
-      <LogoutButton />
+    <div style={{ backgroundColor: "#f5f7fa", minHeight: "100vh" }}>
+      <TopBar />
+      <div style={dashboardStyles.container}>
+        <h1 style={{ ...dashboardStyles.title, color: "#1565c0" }}>
+          Student Dashboard
+        </h1>
+        <p style={dashboardStyles.subtitle}>
+          Explore internships and manage your profile.
+        </p>
+      </div>
     </div>
   );
 }
