@@ -1,7 +1,8 @@
-// LoginPage.jsx
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { styles } from "../styles/LoginPageStyles";
+import { authService } from "../services/authService"; // ✅ Import service
+
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,20 +11,32 @@ const LoginPage = () => {
   const [hoveredButton, setHoveredButton] = useState(false);
   const [activeButton, setActiveButton] = useState(false);
   const [hoveredToggle, setHoveredToggle] = useState(false);
-  const [hoveredLink, setHoveredLink] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    alert(`Login attempted with:\nEmail: ${email}`);
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await authService.loginUser(email, password);
+      console.log("✅ Login success:", res);
+
+      // Navigate or show success message here
+      alert("Login successful!");
+    } catch (err) {
+      console.error("❌ Login failed:", err);
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         <h2 style={styles.title}>Placement Portal</h2>
-   
 
         <form onSubmit={handleSubmit} style={styles.form}>
           {/* Email Input */}
@@ -76,6 +89,13 @@ const LoginPage = () => {
             </div>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <p style={{ color: "red", fontSize: 14, marginBottom: 8 }}>
+              {error}
+            </p>
+          )}
+
           {/* Login Button */}
           <button
             type="submit"
@@ -88,11 +108,11 @@ const LoginPage = () => {
             onMouseLeave={() => setHoveredButton(false)}
             onMouseDown={() => setActiveButton(true)}
             onMouseUp={() => setActiveButton(false)}
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-       
       </div>
     </div>
   );
